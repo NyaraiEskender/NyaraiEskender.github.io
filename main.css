@@ -1,0 +1,25 @@
+body {
+    background-color: black;
+    margin: 0;
+    padding: 0;
+}
+
+#main h1 {
+    color: white;
+    font-family: Helvetica;
+    margin-top: 30vh;
+    text-align: center;
+    font-size: 40pt;
+}
+
+#links {
+    width: 172px;
+    margin: 0 auto;
+}
+
+#links a {
+    color: #eee;
+    font-family: Helvetiva;
+    font-size: 15pt;
+    margin: 0 5px;
+}
