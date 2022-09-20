@@ -19,7 +19,7 @@ function initializeSurvey(surveyName, linkIdentifier) {
 
 	var logFilename = getLogName(surveyName, argc, id, age, gender);
 	// Set download attribute
-    $('#downloadResults').attr("download", logFilename);
+    // $('#downloadResults').attr("download", logFilename);
 	
 	$(linkIdentifier).each(function(index, e) {
 		rawLink = $(e).attr("href");
