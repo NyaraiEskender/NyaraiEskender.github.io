@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/survey.css">
+    <title>Flow Short Scale</title>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/surveyutils.js"></script>
+    <script>
+        var userData;
+
+        var statements = {
+            "FA-S.1": "1. I lost myself in this experience.",
+            "FA-S.2": "2. The time I spent using the application just slipped away.",
+            "FA-S.3": "3. I was absorbed in this experience.",
+            "PU-S.1": "4. I felt frustrated while using the application",
+            "PU-S.2": "5. I found the application confusing to use.",
+            "PU-S.3": "6. Using the application was demanding.",
+            "AE-S.1": "7. the application was attractive.",
+            "AE-S.2": "8. the application was aesthetically appealing.",
+            "AE-S.3": "9. the application appealed to my senses.",
+            "RW-S.1": "10. Using Application X was worthwhile.",
+            "RW-S.2": "11. My experience was rewarding.",
+            "RW-S.3": "12. I felt interested in this experience." 
+        }
+
+        function validateForm() {
+            var validForm = true;
+			numQuestions = 12;
+
+            // Check that all questions have been answered
+            for (iQ = 0; iQ < numQuestions; iQ++) {
+                rating = $("input:radio[name='rating_groupQ" + iQ + "']:checked").val();
+
+                // If rating is null
+                if (!rating) {
+                    document.getElementById("formWarning").style.display = "block";
+                    document.getElementById("formWarning").innerHTML = "You missed Q" + iQ + ".";
+					document.getElementById("ratingQLabel" + iQ).style.color = "red";
+                    validForm = false;
+                    break;
+                } else {
+					document.getElementById("ratingQLabel" + iQ).style.color = "black";
+				}
+            }
+
+            // If form completed, then hide warning and survey and show results submission div
+            if (validForm)
+            {
+                document.getElementById("formWarning").style.display = "none";
+                document.getElementById("flowSurvey").style.display = "none";
+                document.getElementById("resultsSubmission").style.display = "block";
+            }
+
+            return validForm;
+        }
+
+        function populateSurvey() {
+            // Assemble ratins
+            var iQ = 0;
+            for (var key in statements) {
+                var sevenPointScale = 
+				  "<input type='radio' name='rating_groupQ" + iQ +"' value='1'>-" +
+                  "<input type='radio' name='rating_groupQ" + iQ +"' value='2'>-" +
+                  "<input type='radio' name='rating_groupQ" + iQ +"' value='3'>-" +
+                  "<input type='radio' name='rating_groupQ" + iQ +"' value='4'>-" +
+                  "<input type='radio' name='rating_groupQ" + iQ +"' value='5'>-" +
+                  "<input type='radio' name='rating_groupQ" + iQ +"' value='6'>-" +
+                  "<input type='radio' name='rating_groupQ" + iQ +"' value='7'>";
+
+                var ninePointScale = sevenPointScale +
+                  "-<input type='radio' name='rating_groupQ" + iQ +"' value='8'>" +
+                  "-<input type='radio' name='rating_groupQ" + iQ +"' value='9'>";
+
+                // Attach rating descriptions
+                var scale = "";
+                var loPhrase = "not at all";
+                var hiPhrase = "very much";
+				
+				scale = sevenPointScale;
+
+                var statementRow =  "<tr id=ratingQLabel" + iQ + "><td>" + statements[key] + "</td>" +
+                                    "<td class='scaleLabel' align='right'>" + loPhrase + "</td>"+
+                                    "<td id=ratingQ" + iQ +" align='center'>" + scale + "</td>" +
+                                    "<td class='scaleLabel' align='left'>" + hiPhrase + "</td></tr>";
+
+                $('#flowRatingTable  tbody').append(statementRow);
+
+                iQ++;
+            }
+
+            // Alternate row colors
+            $('#flowRatingTable').each(function() {
+                $("tr:even").css("background-color", "#eeeeee");
+                $("tr:odd").css("background-color", "#ffffff");
+            });
+        }       
+    </script>
+</head>
+<body onload="userData = initializeSurvey('flow', '.navlink'); populateSurvey()">
+    <div class="panel wide">
+        <div id="flowSurvey">
+            <h2>Flow Short Scale</h2>
+            <form name="flow" id="flowForm">
+                <table id="flowRatingTable"><tbody></tbody></table>
+				<br><br>
+                <inputWarning id="formWarning"></inputWarning>
+                <button type="button" onclick="return validateForm()">done</button>
+            </form>
+        </div>
+
+        <div id="resultsSubmission" style="display:none;">
+            <h2>Submission Page</h2>
+            <p>
+                Thank you for filling this questionnaire. Please submit your results now.
+            </p>
+            <a href="" id="downloadResults">Submit Results</a>
+        </div>
+
+        <div id="returnToMenu" style="display:none;">
+            <h2>Survey complete</h2>
+            <a class="navlink" href="surveymenu.html">menu</a>
+        </div>
+
+    </div>
+
+    <script>
+        // Handle downloadResults on click
+        document.getElementById('downloadResults').onclick = function() {
+
+            var final_results = {}
+            var iQ = 0;
+            for (var key in statements) {
+                var rating = $("input:radio[name='rating_groupQ" + iQ + "']:checked").val();
+                var key_name = key.toLowerCase().replace("-", "").replace(".", "");
+                final_results[key_name] = parseInt(rating);
+                iQ++;
+            }
+
+            final_results["user"] = userData;
+
+            console.log(final_results); 
+
+            var url = "https://mpals-backend-staging.herokuapp.com/questionnaire/ue"
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(final_results));
+
+            document.getElementById('resultsSubmission').style.display = "none";
+            document.getElementById('returnToMenu').style.display = "block";
+          };
+    </script>
+
+</body>
+</html>

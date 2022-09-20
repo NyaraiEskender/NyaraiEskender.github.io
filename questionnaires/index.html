@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/survey.css">
+    <title>Participant Details</title>
+    <script>
+		// Change commented line if needed to ask for less information.
+		//var questions = ["ID"];
+		//var inputTypes = ['<input type="text" name="id" />'];
+
+		var questions = ["Email", "Age", "Gender"];
+		var inputTypes = ['<input type="text" name="id" />', 
+						  '<input type="number" name="age" min="18" max="150" />',
+						  '<input type="radio" name="gender" value="m" />Male\
+						   <input type="radio" name="gender" value="f" />Female\
+						   <input type="radio" name="gender" value="o" />Other'];
+
+		function creatTable(){
+			var inputPanel = document.getElementById("inputPanel");
+			
+			// Provide information on how many entries is being send.
+			inputPanel.innerHTML = '<input type="hidden" value="' + questions.length + '" name="argc" />';
+		
+			// Generate the table with desired number of rows.
+			var tab = document.createElement("table");
+			tab.style.margin = "auto";
+			for(var i = 0; i < questions.length; ++i) {
+				var tr = tab.insertRow();
+				td = tr.insertCell(0);
+				td.innerHTML = "Participant" + " " + questions[i];
+				td = tr.insertCell(1);
+				td.innerHTML = inputTypes[i];
+				td.setAttribute("id", "inputLabel");
+				
+				tr = tab.insertRow();
+				td = tr.insertCell(0);
+				td = tr.insertCell(1);
+				td.setAttribute("class", "inputWarning");
+				td.setAttribute("id", questions[i].toLowerCase() + "InputWarning");
+			}
+			inputPanel.appendChild(tab);
+		}
+		
+        function validateForm() {
+            var validForm = true;
+			for (var i = 0; i < questions.length; ++i) {
+				var val = document.forms["participantRegistration"][questions[i].toLowerCase()].value;
+				if (!Boolean(val)) {
+					document.getElementById(questions[i].toLowerCase() + "InputWarning").style.display = "block";
+					document.getElementById(questions[i].toLowerCase() + "InputWarning").innerHTML = "Please fill this field.";
+					validForm = false;
+				}
+			}
+            return validForm;
+        }
+    </script>
+</head>
+
+<body onload="creatTable()">
+
+    <div class="panel">
+
+        <h2>Participant Details</h2>
+
+        <form name="participantRegistration" action="surveymenu.html" onsubmit="return validateForm()" method="get">
+            <div id="inputPanel"></div><br><br>
+            <button type="submit" value="next">next</button>
+        </form>
+
+    </div>
+
+</body>
+</html>
